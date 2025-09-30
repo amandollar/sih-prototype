@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Users, MessageSquare, TrendingUp, Filter, RefreshCw } from 'lucide-react'
 import SocialMediaMonitor from '../../components/SocialMediaMonitor'
 import { SocialMediaPost } from '../../types'
@@ -16,11 +16,7 @@ export default function SocialMedia() {
   })
   const [showFilters, setShowFilters] = useState(false)
 
-  useEffect(() => {
-    fetchPosts()
-  }, [filters])
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
@@ -31,13 +27,25 @@ export default function SocialMedia() {
 
       const response = await fetch(`/api/social-media?${params}`)
       const data = await response.json()
-      setPosts(data)
+      
+      // Ensure data is always an array
+      if (Array.isArray(data)) {
+        setPosts(data)
+      } else {
+        console.error('API returned non-array data:', data)
+        setPosts([])
+      }
     } catch (error) {
       console.error('Error fetching social media posts:', error)
+      setPosts([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters])
+
+  useEffect(() => {
+    fetchPosts()
+  }, [fetchPosts])
 
   const platforms = ['ALL', 'TWITTER', 'FACEBOOK', 'YOUTUBE', 'INSTAGRAM']
   const hazardTypes = [
@@ -89,14 +97,14 @@ export default function SocialMedia() {
     },
     {
       name: 'Urgent Posts',
-      value: posts.filter(p => p.sentiment === 'URGENT').length,
+      value: Array.isArray(posts) ? posts.filter(p => p.sentiment === 'URGENT').length : 0,
       icon: TrendingUp,
       color: 'text-red-600',
       bgColor: 'bg-red-100'
     },
     {
       name: 'High Confidence',
-      value: posts.filter(p => p.confidence > 0.8).length,
+      value: Array.isArray(posts) ? posts.filter(p => p.confidence > 0.8).length : 0,
       icon: TrendingUp,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100'
@@ -252,8 +260,8 @@ export default function SocialMedia() {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Distribution</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {platforms.filter(p => p !== 'ALL').map(platform => {
-            const count = posts.filter(p => p.platform === platform).length
-            const percentage = posts.length > 0 ? (count / posts.length * 100).toFixed(1) : 0
+            const count = Array.isArray(posts) ? posts.filter(p => p.platform === platform).length : 0
+            const percentage = Array.isArray(posts) && posts.length > 0 ? (count / posts.length * 100).toFixed(1) : 0
             return (
               <div key={platform} className="text-center">
                 <div className="text-2xl mb-2">{getPlatformIcon(platform)}</div>
@@ -271,8 +279,8 @@ export default function SocialMedia() {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Sentiment Analysis</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {sentiments.filter(s => s !== 'ALL').map(sentiment => {
-            const count = posts.filter(p => p.sentiment === sentiment).length
-            const percentage = posts.length > 0 ? (count / posts.length * 100).toFixed(1) : 0
+            const count = Array.isArray(posts) ? posts.filter(p => p.sentiment === sentiment).length : 0
+            const percentage = Array.isArray(posts) && posts.length > 0 ? (count / posts.length * 100).toFixed(1) : 0
             return (
               <div key={sentiment} className="text-center">
                 <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getSentimentColor(sentiment)}`}>

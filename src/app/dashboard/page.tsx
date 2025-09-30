@@ -23,10 +23,13 @@ export default function Dashboard() {
       const reportsData = await reportsRes.json()
       const hotspotsData = await hotspotsRes.json()
       
-      setReports(reportsData)
-      setHotspots(hotspotsData)
+      // Ensure data is always an array
+      setReports(Array.isArray(reportsData) ? reportsData : [])
+      setHotspots(Array.isArray(hotspotsData) ? hotspotsData : [])
     } catch (error) {
       console.error('Error fetching data:', error)
+      setReports([])
+      setHotspots([])
     } finally {
       setLoading(false)
     }
@@ -73,14 +76,14 @@ export default function Dashboard() {
     },
     {
       name: 'Verified Reports',
-      value: reports.filter(r => r.verified).length,
+      value: Array.isArray(reports) ? reports.filter(r => r.verified).length : 0,
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-100'
     },
     {
       name: 'Critical Alerts',
-      value: reports.filter(r => r.severity === 'CRITICAL').length,
+      value: Array.isArray(reports) ? reports.filter(r => r.severity === 'CRITICAL').length : 0,
       icon: TrendingUp,
       color: 'text-red-600',
       bgColor: 'bg-red-100'

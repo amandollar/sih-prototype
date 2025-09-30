@@ -47,7 +47,17 @@ export async function GET(request: NextRequest) {
     })
 
     // Convert dates to strings for the Report interface
-    const reportsWithStringDates = reports.map(report => ({
+    const reportsWithStringDates = reports.map((report: {
+      id: string
+      title: string
+      location: string
+      latitude: number
+      longitude: number
+      hazardType: string
+      severity: string
+      verified: boolean
+      createdAt: Date
+    }) => ({
       ...report,
       createdAt: report.createdAt.toISOString()
     }))

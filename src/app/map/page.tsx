@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { MapPin, AlertTriangle, Filter, RefreshCw } from 'lucide-react'
 import { Report, Hotspot } from '../../types'
@@ -29,11 +29,7 @@ export default function Map() {
   })
   const [showFilters, setShowFilters] = useState(false)
 
-  useEffect(() => {
-    fetchData()
-  }, [filters])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true)
       const [reportsRes, hotspotsRes] = await Promise.all([
@@ -50,15 +46,21 @@ export default function Map() {
       const reportsData = await reportsRes.json()
       const hotspotsData = await hotspotsRes.json()
       
-      setReports(reportsData)
-      setHotspots(hotspotsData)
+      // Ensure data is always an array
+      setReports(Array.isArray(reportsData) ? reportsData : [])
+      setHotspots(Array.isArray(hotspotsData) ? hotspotsData : [])
     } catch (error) {
       console.error('Error fetching data:', error)
+      setReports([])
+      setHotspots([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters])
 
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   const hazardTypes = [
     'ALL', 'TSUNAMI', 'STORM_SURGE', 'HIGH_WAVES', 'SWELL_SURGE', 
@@ -191,7 +193,7 @@ export default function Map() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">High Severity</p>
               <p className="text-2xl font-bold text-gray-900">
-                {reports.filter(r => r.severity === 'HIGH' || r.severity === 'CRITICAL').length}
+                {Array.isArray(reports) ? reports.filter(r => r.severity === 'HIGH' || r.severity === 'CRITICAL').length : 0}
               </p>
             </div>
           </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Filter, Search, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import ReportCard from '../../components/ReportCard'
 import { Report } from '../../types'
@@ -16,11 +16,7 @@ export default function Reports() {
   })
   const [showFilters, setShowFilters] = useState(false)
 
-  useEffect(() => {
-    fetchReports()
-  }, [filters])
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
@@ -30,13 +26,25 @@ export default function Reports() {
 
       const response = await fetch(`/api/reports?${params}`)
       const data = await response.json()
-      setReports(data)
+      
+      // Ensure data is always an array
+      if (Array.isArray(data)) {
+        setReports(data)
+      } else {
+        console.error('API returned non-array data:', data)
+        setReports([])
+      }
     } catch (error) {
       console.error('Error fetching reports:', error)
+      setReports([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters])
+
+  useEffect(() => {
+    fetchReports()
+  }, [fetchReports])
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -62,11 +70,11 @@ export default function Reports() {
     }
   }
 
-  const filteredReports = reports.filter(report => 
+  const filteredReports = Array.isArray(reports) ? reports.filter(report => 
     filters.search === '' || 
     report.title.toLowerCase().includes(filters.search.toLowerCase()) ||
     report.location.toLowerCase().includes(filters.search.toLowerCase())
-  )
+  ) : []
 
   const hazardTypes = [
     'ALL', 'TSUNAMI', 'STORM_SURGE', 'HIGH_WAVES', 'SWELL_SURGE', 
@@ -185,7 +193,7 @@ export default function Reports() {
             <AlertTriangle className="h-8 w-8 text-blue-600" />
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Total Reports</p>
-              <p className="text-2xl font-bold text-gray-900">{reports.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{Array.isArray(reports) ? reports.length : 0}</p>
             </div>
           </div>
         </div>
@@ -196,7 +204,7 @@ export default function Reports() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Verified</p>
               <p className="text-2xl font-bold text-gray-900">
-                {reports.filter(r => r.verified).length}
+                {Array.isArray(reports) ? reports.filter(r => r.verified).length : 0}
               </p>
             </div>
           </div>
@@ -208,7 +216,7 @@ export default function Reports() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Pending</p>
               <p className="text-2xl font-bold text-gray-900">
-                {reports.filter(r => !r.verified).length}
+                {Array.isArray(reports) ? reports.filter(r => !r.verified).length : 0}
               </p>
             </div>
           </div>
@@ -220,7 +228,7 @@ export default function Reports() {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Critical</p>
               <p className="text-2xl font-bold text-gray-900">
-                {reports.filter(r => r.severity === 'CRITICAL').length}
+                {Array.isArray(reports) ? reports.filter(r => r.severity === 'CRITICAL').length : 0}
               </p>
             </div>
           </div>

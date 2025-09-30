@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Twitter, Facebook, Youtube, MessageSquare, TrendingUp } from 'lucide-react'
 
 interface SocialMediaPost {
@@ -24,11 +24,7 @@ export default function SocialMediaMonitor() {
     hazardType: 'ALL'
   })
 
-  useEffect(() => {
-    fetchSocialMediaPosts()
-  }, [filters])
-
-  const fetchSocialMediaPosts = async () => {
+  const fetchSocialMediaPosts = useCallback(async () => {
     try {
       setIsLoading(true)
       const params = new URLSearchParams()
@@ -157,7 +153,11 @@ export default function SocialMediaMonitor() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [filters])
+
+  useEffect(() => {
+    fetchSocialMediaPosts()
+  }, [fetchSocialMediaPosts])
 
   const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
