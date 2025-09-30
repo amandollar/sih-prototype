@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(CITIZEN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reports Report[]
+  socialMediaPosts SocialMediaPost[]
+
+  @@map("users")
+}
+
+model Report {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  hazardType  HazardType
+  severity    Severity
+  latitude    Float
+  longitude   Float
+  location    String
+  mediaUrls   String      // JSON string of image/video URLs
+  status      ReportStatus @default(PENDING)
+  verified    Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+model SocialMediaPost {
+  id          String   @id @default(cuid())
+  platform    String   // twitter, facebook, youtube, etc.
+  postId      String   // Original post ID from platform
+  content     String
+  author      String
+  latitude    Float?
+  longitude   Float?
+  location    String?
+  hazardType  HazardType?
+  sentiment   Sentiment?
+  confidence  Float?   // NLP confidence score
+  isRelevant  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("social_media_posts")
+}
+
+model Hotspot {
+  id          String   @id @default(cuid())
+  latitude    Float
+  longitude   Float
+  radius      Float    // in meters
+  intensity   Float    // 0-1 scale
+  hazardType  HazardType
+  reportCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("hotspots")
+}
+
+enum UserRole {
+  CITIZEN
+  OFFICIAL
+  ANALYST
+  ADMIN
+}
+
+enum HazardType {
+  TSUNAMI
+  STORM_SURGE
+  HIGH_WAVES
+  SWELL_SURGE
+  COASTAL_CURRENT
+  FLOODING
+  COASTAL_DAMAGE
+  ABNORMAL_TIDE
+  OTHER
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReportStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  INVESTIGATING
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+  URGENT
+}
