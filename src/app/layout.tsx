@@ -3,12 +3,13 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from 'react-hot-toast'
+import Layout from '../components/Layout'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Yamuna Yuki - Ocean Hazard Platform',
-  description: 'Ocean hazard reporting and monitoring platform for coastal communities',
+  title: 'OceanGuard - Ocean Hazard Monitoring System',
+  description: 'Real-time ocean hazard monitoring and reporting system for coastal communities',
 }
 
 export default function RootLayout({
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          {children}
+          <Layout>
+            {children}
+          </Layout>
           <Toaster position="top-right" />
         </Providers>
       </body>
