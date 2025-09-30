@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Filter, Search, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import ReportCard from '../../components/ReportCard'
 import { Report } from '../../types'
+import { getFilteredReports } from '../../lib/fakeData'
 
 export default function Reports() {
   const [reports, setReports] = useState<Report[]>([])
@@ -17,29 +18,13 @@ export default function Reports() {
   const [showFilters, setShowFilters] = useState(false)
 
   const fetchReports = useCallback(async () => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams()
-      if (filters.hazardType !== 'ALL') params.append('hazardType', filters.hazardType)
-      if (filters.severity !== 'ALL') params.append('severity', filters.severity)
-      params.append('dateRange', filters.dateRange)
-
-      const response = await fetch(`/api/reports?${params}`)
-      const data = await response.json()
-      
-      // Ensure data is always an array
-      if (Array.isArray(data)) {
-        setReports(data)
-      } else {
-        console.error('API returned non-array data:', data)
-        setReports([])
-      }
-    } catch (error) {
-      console.error('Error fetching reports:', error)
-      setReports([])
-    } finally {
+    setLoading(true)
+    // Simulate API delay
+    setTimeout(() => {
+      const filteredReports = getFilteredReports(filters)
+      setReports(filteredReports)
       setLoading(false)
-    }
+    }, 500)
   }, [filters])
 
   useEffect(() => {
@@ -91,10 +76,37 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
+      {/* Hero Section with Ocean Images */}
+      <section className="relative h-80 rounded-2xl overflow-hidden">
+        <div className="absolute inset-0">
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-14bda5d4c4ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')`
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-800/60 to-cyan-900/80" />
+        </div>
+        
+        <div className="relative z-10 h-full flex items-center justify-center text-center px-6">
+          <div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              Ocean Hazard
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
+                Reports
+              </span>
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Real-time monitoring and tracking of ocean hazard reports from coastal communities
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
+          <h2 className="text-2xl font-bold text-gray-900">Report Dashboard</h2>
           <p className="mt-2 text-gray-600">
             View and manage ocean hazard reports
           </p>
@@ -229,6 +241,69 @@ export default function Reports() {
               <p className="text-sm font-medium text-gray-600">Critical</p>
               <p className="text-2xl font-bold text-gray-900">
                 {Array.isArray(reports) ? reports.filter(r => r.severity === 'CRITICAL').length : 0}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Visual Enhancement Section */}
+      <div className="bg-white rounded-lg shadow p-8">
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Ocean Monitoring in Action</h3>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            See how our advanced monitoring system captures and analyzes ocean conditions in real-time
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Monitoring Station */}
+          <div className="relative group overflow-hidden rounded-xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h4 className="text-lg font-bold mb-2">Monitoring Stations</h4>
+              <p className="text-sm text-white/90">
+                Advanced sensors continuously monitor ocean conditions and weather patterns
+              </p>
+            </div>
+          </div>
+
+          {/* Data Analysis */}
+          <div className="relative group overflow-hidden rounded-xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h4 className="text-lg font-bold mb-2">Data Analysis</h4>
+              <p className="text-sm text-white/90">
+                AI algorithms process vast amounts of data to identify potential hazards
+              </p>
+            </div>
+          </div>
+
+          {/* Community Reports */}
+          <div className="relative group overflow-hidden rounded-xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h4 className="text-lg font-bold mb-2">Community Input</h4>
+              <p className="text-sm text-white/90">
+                Coastal communities contribute valuable ground-level observations and reports
               </p>
             </div>
           </div>

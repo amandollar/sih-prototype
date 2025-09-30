@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Users, MessageSquare, TrendingUp, Filter, RefreshCw } from 'lucide-react'
 import SocialMediaMonitor from '../../components/SocialMediaMonitor'
 import { SocialMediaPost } from '../../types'
+import { getFilteredSocialMediaPosts } from '../../lib/fakeData'
 
 export default function SocialMedia() {
   const [posts, setPosts] = useState<SocialMediaPost[]>([])
@@ -17,30 +18,13 @@ export default function SocialMedia() {
   const [showFilters, setShowFilters] = useState(false)
 
   const fetchPosts = useCallback(async () => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams()
-      if (filters.platform !== 'ALL') params.append('platform', filters.platform)
-      if (filters.hazardType !== 'ALL') params.append('hazardType', filters.hazardType)
-      if (filters.sentiment !== 'ALL') params.append('sentiment', filters.sentiment)
-      params.append('dateRange', filters.dateRange)
-
-      const response = await fetch(`/api/social-media?${params}`)
-      const data = await response.json()
-      
-      // Ensure data is always an array
-      if (Array.isArray(data)) {
-        setPosts(data)
-      } else {
-        console.error('API returned non-array data:', data)
-        setPosts([])
-      }
-    } catch (error) {
-      console.error('Error fetching social media posts:', error)
-      setPosts([])
-    } finally {
+    setLoading(true)
+    // Simulate API delay
+    setTimeout(() => {
+      const filteredPosts = getFilteredSocialMediaPosts(filters)
+      setPosts(filteredPosts)
       setLoading(false)
-    }
+    }, 500)
   }, [filters])
 
   useEffect(() => {
@@ -113,10 +97,37 @@ export default function SocialMedia() {
 
   return (
     <div className="space-y-6">
+      {/* Hero Section with Ocean Images */}
+      <section className="relative h-80 rounded-2xl overflow-hidden">
+        <div className="absolute inset-0">
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')`
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-800/60 to-cyan-900/80" />
+        </div>
+        
+        <div className="relative z-10 h-full flex items-center justify-center text-center px-6">
+          <div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              Social Media
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
+                Intelligence
+              </span>
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Monitor social media for ocean hazard discussions and community reports in real-time
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Social Media Monitor</h1>
+          <h2 className="text-2xl font-bold text-gray-900">Social Media Monitor</h2>
           <p className="mt-2 text-gray-600">
             Monitor social media for ocean hazard discussions and alerts
           </p>
@@ -237,6 +248,69 @@ export default function SocialMedia() {
             </div>
           )
         })}
+      </div>
+
+      {/* Visual Enhancement Section */}
+      <div className="bg-white rounded-lg shadow p-8">
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Social Media Intelligence in Action</h3>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Discover how we harness the power of social media to gather real-time ocean hazard intelligence
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Real-time Monitoring */}
+          <div className="relative group overflow-hidden rounded-xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h4 className="text-lg font-bold mb-2">Real-time Monitoring</h4>
+              <p className="text-sm text-white/90">
+                Continuous scanning of social platforms for ocean-related discussions and emergency reports
+              </p>
+            </div>
+          </div>
+
+          {/* Sentiment Analysis */}
+          <div className="relative group overflow-hidden rounded-xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h4 className="text-lg font-bold mb-2">Sentiment Analysis</h4>
+              <p className="text-sm text-white/90">
+                AI-powered analysis to detect urgency levels and emotional context in social media posts
+              </p>
+            </div>
+          </div>
+
+          {/* Community Engagement */}
+          <div className="relative group overflow-hidden rounded-xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h4 className="text-lg font-bold mb-2">Community Engagement</h4>
+              <p className="text-sm text-white/90">
+                Engaging with coastal communities to gather ground-level intelligence and first-hand reports
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Social Media Monitor Component */}

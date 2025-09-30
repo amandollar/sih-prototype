@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { MapPin, AlertTriangle, Filter, RefreshCw } from 'lucide-react'
 import { Report, Hotspot } from '../../types'
+import { getFilteredReports, getFilteredHotspots } from '../../lib/fakeData'
 
 // Dynamically import the map component to avoid SSR issues
 const MapComponent = dynamic(() => import('../../components/MapComponent'), { 
@@ -30,32 +31,15 @@ export default function Map() {
   const [showFilters, setShowFilters] = useState(false)
 
   const fetchData = useCallback(async () => {
-    try {
-      setLoading(true)
-      const [reportsRes, hotspotsRes] = await Promise.all([
-        fetch(`/api/reports?${new URLSearchParams({
-          ...(filters.hazardType !== 'ALL' && { hazardType: filters.hazardType }),
-          ...(filters.severity !== 'ALL' && { severity: filters.severity }),
-          dateRange: filters.dateRange
-        })}`),
-        fetch(`/api/hotspots?${new URLSearchParams({
-          dateRange: filters.dateRange
-        })}`)
-      ])
-      
-      const reportsData = await reportsRes.json()
-      const hotspotsData = await hotspotsRes.json()
-      
-      // Ensure data is always an array
-      setReports(Array.isArray(reportsData) ? reportsData : [])
-      setHotspots(Array.isArray(hotspotsData) ? hotspotsData : [])
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      setReports([])
-      setHotspots([])
-    } finally {
+    setLoading(true)
+    // Simulate API delay
+    setTimeout(() => {
+      const filteredReports = getFilteredReports(filters)
+      const filteredHotspots = getFilteredHotspots(filters.dateRange)
+      setReports(filteredReports)
+      setHotspots(filteredHotspots)
       setLoading(false)
-    }
+    }, 500)
   }, [filters])
 
   useEffect(() => {

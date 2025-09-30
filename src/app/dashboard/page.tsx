@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AlertTriangle, MapPin, Users, TrendingUp, CheckCircle } from 'lucide-react'
 import { Report, Hotspot } from '../../types'
+import { fakeReports, fakeHotspots } from '../../lib/fakeData'
 
 export default function Dashboard() {
   const [reports, setReports] = useState<Report[]>([])
@@ -10,30 +11,15 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchData()
-  }, [])
-
-  const fetchData = async () => {
-    try {
-      const [reportsRes, hotspotsRes] = await Promise.all([
-        fetch('/api/reports?dateRange=24h'),
-        fetch('/api/hotspots?dateRange=24h')
-      ])
-      
-      const reportsData = await reportsRes.json()
-      const hotspotsData = await hotspotsRes.json()
-      
-      // Ensure data is always an array
-      setReports(Array.isArray(reportsData) ? reportsData : [])
-      setHotspots(Array.isArray(hotspotsData) ? hotspotsData : [])
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      setReports([])
-      setHotspots([])
-    } finally {
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setReports(fakeReports)
+      setHotspots(fakeHotspots)
       setLoading(false)
-    }
-  }
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -100,11 +86,38 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Hero Section with Ocean Images */}
+      <section className="relative h-96 rounded-2xl overflow-hidden">
+        <div className="absolute inset-0">
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 via-blue-800/50 to-cyan-900/70" />
+        </div>
+        
+        <div className="relative z-10 h-full flex items-center justify-center text-center px-6">
+          <div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              Ocean Hazard
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
+                Monitoring Dashboard
+              </span>
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Real-time ocean hazard monitoring and reporting system powered by AI and community intelligence
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h2 className="text-2xl font-bold text-gray-900">System Overview</h2>
         <p className="mt-2 text-gray-600">
-          Real-time ocean hazard monitoring and reporting system
+          Monitor and track ocean hazards in real-time
         </p>
       </div>
 
@@ -126,6 +139,140 @@ export default function Dashboard() {
             </div>
           )
         })}
+      </div>
+
+      {/* Features Section with Ocean Images */}
+      <div className="bg-white rounded-lg shadow p-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Key Features</h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Advanced ocean monitoring capabilities powered by cutting-edge technology and community intelligence
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Feature 1 - Real-time Monitoring */}
+          <div className="relative group overflow-hidden rounded-2xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-14bda5d4c4ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <div className="flex items-center mb-2">
+                <AlertTriangle className="h-6 w-6 text-yellow-400 mr-2" />
+                <h3 className="text-xl font-bold">Real-time Monitoring</h3>
+              </div>
+              <p className="text-sm text-white/90">
+                24/7 continuous monitoring of ocean conditions with instant alerts for hazardous situations
+              </p>
+            </div>
+          </div>
+
+          {/* Feature 2 - Interactive Maps */}
+          <div className="relative group overflow-hidden rounded-2xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <div className="flex items-center mb-2">
+                <MapPin className="h-6 w-6 text-blue-400 mr-2" />
+                <h3 className="text-xl font-bold">Interactive Maps</h3>
+              </div>
+              <p className="text-sm text-white/90">
+                Visualize hazards in real-time with detailed mapping and location-based alerts
+              </p>
+            </div>
+          </div>
+
+          {/* Feature 3 - Community Intelligence */}
+          <div className="relative group overflow-hidden rounded-2xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <div className="flex items-center mb-2">
+                <Users className="h-6 w-6 text-green-400 mr-2" />
+                <h3 className="text-xl font-bold">Community Reports</h3>
+              </div>
+              <p className="text-sm text-white/90">
+                Crowdsourced intelligence from coastal communities and verified by experts
+              </p>
+            </div>
+          </div>
+
+          {/* Feature 4 - AI Analysis */}
+          <div className="relative group overflow-hidden rounded-2xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <div className="flex items-center mb-2">
+                <TrendingUp className="h-6 w-6 text-purple-400 mr-2" />
+                <h3 className="text-xl font-bold">AI-Powered Analysis</h3>
+              </div>
+              <p className="text-sm text-white/90">
+                Machine learning algorithms analyze patterns and predict potential hazards
+              </p>
+            </div>
+          </div>
+
+          {/* Feature 5 - Early Warning System */}
+          <div className="relative group overflow-hidden rounded-2xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <div className="flex items-center mb-2">
+                <CheckCircle className="h-6 w-6 text-red-400 mr-2" />
+                <h3 className="text-xl font-bold">Early Warning System</h3>
+              </div>
+              <p className="text-sm text-white/90">
+                Advanced warning system with multiple notification channels for maximum safety
+              </p>
+            </div>
+          </div>
+
+          {/* Feature 6 - Data Visualization */}
+          <div className="relative group overflow-hidden rounded-2xl">
+            <div 
+              className="h-48 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <div className="flex items-center mb-2">
+                <div className="w-6 h-6 bg-cyan-400 rounded mr-2 flex items-center justify-center">
+                  <span className="text-black text-xs font-bold">📊</span>
+                </div>
+                <h3 className="text-xl font-bold">Data Visualization</h3>
+              </div>
+              <p className="text-sm text-white/90">
+                Comprehensive charts and graphs for detailed analysis and trend monitoring
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Recent Reports */}
